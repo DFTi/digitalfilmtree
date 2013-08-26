@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'edl'
 
 module Digitalfilmtree
@@ -8,9 +9,9 @@ module Digitalfilmtree
 
       def folder=(path)
         @folder = path
-        self.ml = self.glob("*.txt").first
-        self.edl = self.glob("*.edl").first
-        self.movs = self.glob("*.mov")
+        self.ml = self.glob(".txt").first
+        self.edl = self.glob(".edl").first
+        self.movs = self.glob(".mov")
       end
 
       def ready?
@@ -54,7 +55,18 @@ module Digitalfilmtree
       end
 
       def glob(patt)
-        Dir.glob(File.join(self.folder, patt))
+        entries = Dir.entries(self.folder).select do |i|
+          i.include? patt
+        end
+        if sep = File::ALT_SEPARATOR
+          entries.map do |entry|
+            File.join self.folder, sep, entry
+          end
+        else
+          entries.map do |entry|
+            File.join self.folder, entry
+          end
+        end
       end
     end
   end
