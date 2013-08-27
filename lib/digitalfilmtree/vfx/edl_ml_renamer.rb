@@ -4,7 +4,7 @@ require 'edl'
 module Digitalfilmtree
   module VFX
     class EDLMLRenamer
-      attr_accessor :ml, :edl, :movs
+      attr_accessor :ml, :edl, :movs, :ml_name_column
       attr_reader :folder, :count
 
       def folder=(path)
@@ -22,8 +22,9 @@ module Digitalfilmtree
 
       def execute
         raise "Not Ready" unless ready?
-        @count = 0
         parse_marker_list
+        get_marker_list_name_column
+        @count = 0
         EDL::Parser.new.parse(File.open(self.edl)).each do |e|
           find_clip(e.reel) do |path|
             timeline_tc_in = e.rec_start_tc.to_s
@@ -39,9 +40,25 @@ module Digitalfilmtree
 
       protected
 
+      def get_marker_list_name_column
+        row = @ml_data.first
+        loop do
+          if self.ml_name_column && row[self.ml_name_column]
+            puts "Using marker list column index #{self.ml_name_column} for the Name"
+            break
+          else
+            puts "Please enter the number mapping to the Name column in the marker list:"
+            row.each_with_index do |e,i|
+              puts "#{i}) #{e}"
+            end
+            self.ml_name_column = STDIN.gets.strip.to_i
+          end
+        end
+      end
+
       def get_vfx_name timeline_tc_in, &block
         row = @ml_data.select{|r| r.include? timeline_tc_in }
-        name = row.flatten.first
+        name = row.flatten[self.ml_name_column]
         block.call(name) if name
       end
 
@@ -58,7 +75,7 @@ module Digitalfilmtree
         entries = Dir.entries(self.folder).select do |i|
           i.include? patt
         end
-        if sep = File::ALT_SEPARATOR
+        if sep = File::ALT_SEPARATOR # Windows support
           entries.map do |entry|
             File.join self.folder, sep, entry
           end
