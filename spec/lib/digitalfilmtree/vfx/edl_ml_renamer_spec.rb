@@ -11,7 +11,7 @@ describe Digitalfilmtree::VFX::EDLMLRenamer do
 
     context "required files exist" do
       let(:target) { fixture('vfx/edl_ml_renamer') }
-      let(:originals) { subject.movs.map{|i| Pathname.new(i)} }
+      let(:originals) { subject.movs }
       before do
         STDIN.stub(:gets).and_return "0"
         @output = []
@@ -20,12 +20,15 @@ describe Digitalfilmtree::VFX::EDLMLRenamer do
           args.each {|a| @output << a }
         end
         subject.folder = target.path
-        originals.each {|i| i.should exist }
+        originals.each {|i| i.should_not be_renamed }
       end
       shared_examples_for 'rename' do
         it "renames .mov files in the folder" do
           subject.execute
-          originals.each {|i| i.should_not exist }
+          originals.each do |i|
+            i.should be_renamed
+            i.should exist
+          end
           @output[-3..-1].should eq [
             "Renamed V1-0003_A013C007_130724_R2LG.mov to NLA098_01_02.mov",
             "Renamed V1-0004_B016C005_130724_R2M9.mov to NLA098_01_03.mov",

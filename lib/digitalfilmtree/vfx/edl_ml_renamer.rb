@@ -1,9 +1,12 @@
+require 'digitalfilmtree/util/mediainfo'
+require 'digitalfilmtree/model/clip'
 require 'fileutils'
 require 'edl'
 
 module Digitalfilmtree
   module VFX
     class EDLMLRenamer
+      include Util::Mediainfo
       attr_accessor :ml, :edl, :movs, :ml_name_column
       attr_reader :folder, :count
 
@@ -11,13 +14,15 @@ module Digitalfilmtree
         @folder = path
         self.ml = self.glob(".txt").first
         self.edl = self.glob(".edl").first
-        self.movs = self.glob(".mov")
+        self.movs = self.glob(".mov").map do |path|
+          Digitalfilmtree::Model::Clip.new(path)
+        end
       end
 
       def ready?
         self.ml && File.exists?(self.ml) &&
-          self.edl && File.exists?(self.edl) &&
-          self.movs.size >= 1
+        self.edl && File.exists?(self.edl) &&
+        self.movs.size >= 1
       end
 
       def execute
@@ -26,12 +31,10 @@ module Digitalfilmtree
         get_marker_list_name_column
         @count = 0
         EDL::Parser.new.parse(File.open(self.edl)).each do |e|
-          find_clip(e.reel) do |path|
+          find_clip(e.reel) do |clip|
             timeline_tc_in = e.rec_start_tc.to_s
             get_vfx_name(timeline_tc_in) do |vfx_name|
-              new_path = path.gsub(File.basename(path), "#{vfx_name}.mov")
-              FileUtils.mv path, new_path
-              puts "Renamed #{File.basename(path)} to #{File.basename(new_path)}"
+              clip.rename_to("#{vfx_name}.mov")
               @count += 1
             end
           end
@@ -63,8 +66,8 @@ module Digitalfilmtree
       end
 
       def find_clip reel, &block
-        clip = self.movs.select{|i|i.match(/#{reel}/)}.first
-        block.call(clip) if clip && File.exists?(clip)
+        clip = self.movs.select{|i| i.path.match(/#{reel}/)}.first
+        block.call(clip) if clip && clip.exists?
       end
 
       def parse_marker_list
