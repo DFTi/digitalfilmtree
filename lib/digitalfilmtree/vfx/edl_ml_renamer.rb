@@ -1,4 +1,3 @@
-require 'digitalfilmtree/util/mediainfo'
 require 'digitalfilmtree/model/clip'
 require 'fileutils'
 require 'edl'
@@ -6,7 +5,6 @@ require 'edl'
 module Digitalfilmtree
   module VFX
     class EDLMLRenamer
-      include Util::Mediainfo
       attr_accessor :ml, :edl, :movs, :ml_name_column
       attr_reader :folder, :count
 
@@ -31,9 +29,8 @@ module Digitalfilmtree
         get_marker_list_name_column
         @count = 0
         EDL::Parser.new.parse(File.open(self.edl)).each do |e|
-          find_clip(e.reel) do |clip|
-            timeline_tc_in = e.rec_start_tc.to_s
-            get_vfx_name(timeline_tc_in) do |vfx_name|
+          find_clip(e.src_start_tc.to_s) do |clip|
+            get_vfx_name(e.rec_start_tc.to_s) do |vfx_name|
               clip.rename_to("#{vfx_name}.mov")
               @count += 1
             end
@@ -54,19 +51,21 @@ module Digitalfilmtree
             row.each_with_index do |e,i|
               puts "#{i}) #{e}"
             end
-            self.ml_name_column = STDIN.gets.strip.to_i
+            self.ml_name_column = gets.strip.to_i
           end
         end
       end
 
-      def get_vfx_name timeline_tc_in, &block
-        row = @ml_data.select{|r| r.include? timeline_tc_in }
+      def get_vfx_name timecode, &block
+        row = @ml_data.select{|r| r.include? timecode }
         name = row.flatten[self.ml_name_column]
         block.call(name) if name
       end
 
-      def find_clip reel, &block
-        clip = self.movs.select{|i| i.path.match(/#{reel}/)}.first
+      def find_clip timecode, &block
+        clip = self.movs.select do |i|
+          i.start_timecode == timecode
+        end.first
         block.call(clip) if clip && clip.exists?
       end
 

@@ -13,14 +13,16 @@ describe Digitalfilmtree::VFX::EDLMLRenamer do
       let(:target) { fixture('vfx/edl_ml_renamer') }
       let(:originals) { subject.movs }
       before do
-        STDIN.stub(:gets).and_return "0"
         @output = []
-        STDOUT.stub(:puts) do |*args|
-          @output ||= []
-          args.each {|a| @output << a }
-        end
+        subject.stub(:gets).and_return "0"
+        subject.stub(:puts) {|a| @output << a }
         subject.folder = target.path
-        originals.each {|i| i.should_not be_renamed }
+        originals.each do |clip|
+          clip.stub(:puts) do |*args|
+            args.each {|a| @output << a }
+          end
+          clip.should_not be_renamed
+        end
       end
       shared_examples_for 'rename' do
         it "renames .mov files in the folder" do

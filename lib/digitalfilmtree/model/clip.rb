@@ -1,6 +1,10 @@
+require 'digitalfilmtree/util/mediainfo'
+
 module Digitalfilmtree
   module Model
     class Clip
+      include Util::Mediainfo
+
       attr_reader :path
 
       def initialize path
@@ -26,6 +30,10 @@ module Digitalfilmtree
 
       def exists?
         File.exists? self.path
+      end
+
+      def start_timecode
+        @start_timecode ||= mediainfo(self.path, :start_timecode)
       end
     end
   end
