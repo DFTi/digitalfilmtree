@@ -1,3 +1,5 @@
+require 'digitalfilmtree/util'
+
 module Digitalfilmtree
   module Util
     module Mediainfo
@@ -8,7 +10,11 @@ module Digitalfilmtree
 
       def mediainfo path, key
         raise "Mediainfo bin path unset" unless Mediainfo.bin
-        output = `#{Mediainfo.bin} '#{path}'`
+        if Util.platform.windows?
+          path = Util.winpath path
+        end
+        output = `#{Mediainfo.bin} "#{path}"`
+
         if key
           output.scan(REGEX[key]).flatten.first
         else
@@ -26,24 +32,12 @@ module Digitalfilmtree
       end
 
       def self.autoconfigure
-        require 'digitalfilmtree/platform'
-        os = Digitalfilmtree.platform
+        os = Util.platform
         if os.windows?
-          # Might need to install the DLL
-          Mediainfo.bin = File.expand_path(
-            File.join(
-              File.dirname(__FILE__), '..', '..', '..',
-              'vendor', 'util', 'mediainfo', 'windows',
-              'MediaInfo.exe'
-            )).
-            gsub(File::SEPARATOR, File::ALT_SEPARATOR || File::SEPARATOR)
+          path = Util.vendored_bin(:mediainfo, :windows, 'MediaInfo.exe')
+          Mediainfo.bin = Util.winpath(path)
         elsif os.mac?
-          Mediainfo.bin = File.expand_path(
-            File.join(
-              File.dirname(__FILE__), '..', '..', '..',
-              'vendor', 'util', 'mediainfo', 'mac',
-              'mediainfo'
-            ))
+          Mediainfo.bin = Util.vendored_bin(:mediainfo, :mac, 'mediainfo')
         end
       end
     end
