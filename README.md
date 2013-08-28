@@ -10,8 +10,10 @@ Rename .mov files to mapped name column in Marker List (.txt) by referencing emb
 
 #### Dependencies
   * Mediainfo
-    - Mac: `brew install mediainfo`
-    - Windows: http://mediaarea.net/en/MediaInfo/Download/Windows
+
+#### Platforms
+  * Mac OS X Snow Leopard or newer
+  * Windows 7 64-bit or newer
 
 ## Installation
 
