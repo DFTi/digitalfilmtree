@@ -6,17 +6,12 @@ Assorted libraries for our post production worklow
 
 ### Digitalfilmtree::VFX::EDLMLRenamer
 
-Renames .mov files per EDL (.edl) and Marker List (.txt)
+Rename .mov files to mapped name column in Marker List (.txt) by referencing embedded timecode and the EDL (.edl)
 
-### Example
-
-```ruby
-require 'digitalfilmtree/vfx/edl_ml_renamer'
-r = Digitalfilmtree::VFX::EDLMLRenamer.new
-r.folder = "folder/with/files"
-r.execute
-```
-  
+#### Dependencies
+  * Mediainfo
+    - Mac: `brew install mediainfo`
+    - Windows: http://mediaarea.net/en/MediaInfo/Download/Windows
 
 ## Installation
 
