@@ -28,6 +28,7 @@ module Digitalfilmtree
         parse_marker_list
         get_marker_list_name_column
         @count = 0
+        binding.pry if $pry_at_parser
         EDL::Parser.new.parse(File.open(self.edl)).each do |e|
           find_clip(e.src_start_tc.to_s) do |clip|
             get_vfx_name(e.rec_start_tc.to_s) do |vfx_name|
