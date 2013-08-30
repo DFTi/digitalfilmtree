@@ -7,7 +7,7 @@ require 'digitalfilmtree/vfx/edl_ml_renamer'
 include Digitalfilmtree
 
 r = VFX::EDLMLRenamer.new
-r.folder = Util.winpath File.expand_path File.dirname __FILE__
+r.folder = Util.safe_path File.expand_path File.dirname __FILE__
 
 begin
   Util::Mediainfo.autoconfigure
