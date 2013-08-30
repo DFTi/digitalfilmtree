@@ -24,5 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "simplecov"
 
+  spec.add_runtime_dependency "digitalfilmtree-util"
   spec.add_runtime_dependency "edl", "~> 0.1.3"
 end
