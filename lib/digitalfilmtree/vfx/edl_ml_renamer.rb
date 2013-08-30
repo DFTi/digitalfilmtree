@@ -23,7 +23,7 @@ module Digitalfilmtree
         self.movs.size >= 1
       end
 
-      def execute
+      def execute options={}
         raise "Not Ready" unless ready?
         parse_marker_list
         get_marker_list_name_column
@@ -31,7 +31,7 @@ module Digitalfilmtree
         EDL::Parser.new.parse(File.open(self.edl)).each do |e|
           find_clip(e.src_start_tc.to_s) do |clip|
             get_vfx_name(e.rec_start_tc.to_s) do |vfx_name|
-              clip.rename_to("#{vfx_name}.mov")
+              clip.rename_to("#{vfx_name}.mov", options)
               @count += 1
             end
           end

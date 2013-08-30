@@ -16,9 +16,11 @@ module Digitalfilmtree
         File.basename(self.path)
       end
 
-      def rename_to name
+      def rename_to name, options
         new_path = self.path.gsub(self.basename, name)
-        FileUtils.mv self.path, new_path
+        unless options[:dry_run]
+          FileUtils.mv self.path, new_path
+        end
         puts "Renamed #{self.basename} to #{File.basename(new_path)}"
         @path = new_path
         @renamed = true

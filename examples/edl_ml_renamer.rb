@@ -12,7 +12,7 @@ r.folder = Util.winpath File.expand_path File.dirname __FILE__
 begin
   Util::Mediainfo.autoconfigure
   if r.ready?
-    r.execute
+    r.execute # to do a dry-run, use r.execute(:dry_run => true)
   else
     puts "Not ready. Are you missing .txt, .edl, and/or .mov files?"
     puts "I expect these files to exist in the same directory"
@@ -20,6 +20,7 @@ begin
 rescue Exception => ex
   puts "Failed. Reason: #{ex.message}"
 ensure
+  puts "Renamed #{r.count} files"
   puts "Press enter to quit"
   gets
 end
