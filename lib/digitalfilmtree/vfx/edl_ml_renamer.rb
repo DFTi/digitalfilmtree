@@ -24,7 +24,7 @@ module Digitalfilmtree
       end
 
       def events
-        EDL::Parser.new.parse(File.open(self.edl))
+        EDL::Parser.new.parse File.open(self.edl).read
       end
 
       def execute options={}
