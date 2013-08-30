@@ -58,6 +58,12 @@ describe Digitalfilmtree::VFX::EDLMLRenamer do
         it "returns events parsed from the EDL" do
           subject.events.count.should eq 5
         end
+        context "lakan's EDL" do
+          let(:target) { fixture('vfx/edl_ml_renamer/edl_with_92_events') }
+          specify do
+            subject.events.count.should eq 92
+          end
+        end
       end
 
       after { target.clean.reset }
