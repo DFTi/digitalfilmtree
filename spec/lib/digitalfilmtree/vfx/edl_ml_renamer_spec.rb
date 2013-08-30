@@ -54,6 +54,12 @@ describe Digitalfilmtree::VFX::EDLMLRenamer do
         it_behaves_like 'rename'
       end
 
+      describe "#events" do
+        it "returns events parsed from the EDL" do
+          subject.events.count.should eq 5
+        end
+      end
+
       after { target.clean.reset }
     end
   end
