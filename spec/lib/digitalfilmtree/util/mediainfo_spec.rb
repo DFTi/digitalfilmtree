@@ -1,4 +1,3 @@
-require 'digitalfilmtree/platform'
 require 'digitalfilmtree/util/mediainfo'
 
 describe Digitalfilmtree::Util::Mediainfo do
@@ -17,7 +16,7 @@ describe Digitalfilmtree::Util::Mediainfo do
     end
   end
 
-  let(:platform) { Digitalfilmtree.platform } 
+  let(:platform) { Digitalfilmtree::Util.platform } 
 
   describe ".autoconfigure" do
     context "on windows" do

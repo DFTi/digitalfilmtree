@@ -11,7 +11,7 @@ module Digitalfilmtree
       def mediainfo path, key
         raise "Mediainfo bin path unset" unless Mediainfo.bin
         if Util.platform.windows?
-          path = Util.winpath path
+          path = Util.safe_path path
         end
         output = `#{Mediainfo.bin} "#{path}"`
 
@@ -35,7 +35,7 @@ module Digitalfilmtree
         os = Util.platform
         if os.windows?
           path = Util.vendored_bin(:mediainfo, :windows, 'MediaInfo.exe')
-          Mediainfo.bin = Util.winpath(path)
+          Mediainfo.bin = Util.safe_path(path)
         elsif os.mac?
           Mediainfo.bin = Util.vendored_bin(:mediainfo, :mac, 'mediainfo')
         end
